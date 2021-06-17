@@ -181,9 +181,12 @@ ifeq ($(need-config),y)
 # changes are detected.
 -include include/config/auto.conf.cmd
 
+# If not defconfig provided use the default
+DEFCONFIG ?= defconfig
+
 # Allow people to just run `make` as before and not force them to configure
 $(KCONFIG_CONFIG):
-	$(MAKE) $(kconfig) defconfig
+	$(MAKE) $(kconfig) $(DEFCONFIG)
 
 # The actual configuration files used during the build are stored in
 # include/generated/ and include/config/. Update them if .config is newer than
