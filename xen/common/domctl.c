@@ -752,6 +752,7 @@ long do_domctl(XEN_GUEST_HANDLE_PARAM(xen_domctl_t) u_domctl)
 
         if ( add )
         {
+	    printk("mb: %s()\n", __func__);
             printk(XENLOG_G_DEBUG
                    "memory_map:add: dom%d gfn=%lx mfn=%lx nr=%lx\n",
                    d->domain_id, gfn, mfn, nr_mfns);

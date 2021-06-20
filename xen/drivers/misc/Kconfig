@@ -1,0 +1,5 @@
+config MEMORY_SPAN_EXTENDER
+	bool "Memory Span Extender driver" if AGILEX
+	default n
+	help
+	  This selects the Memory Span Extender. If unsure select N.

@@ -1240,6 +1240,7 @@ static int __init map_range_to_domain(const struct dt_device_node *dev,
 
     if ( need_mapping )
     {
+        /*mb: stage-2 mapping resulted in reading in the device-tree */
         res = map_regions_p2mt(d,
                                gaddr_to_gfn(addr),
                                PFN_UP(len),
@@ -1400,10 +1401,14 @@ static int __init handle_device(struct domain *d, struct dt_device_node *dev,
     if ( res < 0 )
         return res;
 
+    if (dt_device_is_compatible(dev, "intel,extender-client"))
+        dt_dprintk("mb: naddr %u\n", naddr);
+
     /* Give permission and map MMIOs */
     for ( i = 0; i < naddr; i++ )
     {
         struct map_range_data mr_data = { .d = d, .p2mt = p2mt };
+        printk("mb: before dt_device_get_address()\n");
         res = dt_device_get_address(dev, i, &addr, &size);
         if ( res )
         {
@@ -1411,6 +1416,12 @@ static int __init handle_device(struct domain *d, struct dt_device_node *dev,
                    i, dt_node_full_name(dev));
             return res;
         }
+
+	if (dt_device_is_compatible(dev, "intel,extender-client")) {
+		dt_dprintk("mb: addr %lx size %lx\n", addr, size);
+		size -= PAGE_SIZE;
+		dt_dprintk("mb: size-=0x1000 = %lx\n", size);
+	}
 
         res = map_range_to_domain(dev, addr, size, &mr_data);
         if ( res )
@@ -1424,6 +1435,7 @@ static int __init handle_device(struct domain *d, struct dt_device_node *dev,
     return 0;
 }
 
+/*mb: handle_node(): device tree parsing and mapping starts here */
 static int __init handle_node(struct domain *d, struct kernel_info *kinfo,
                               struct dt_device_node *node,
                               p2m_type_t p2mt)
@@ -1444,6 +1456,8 @@ static int __init handle_node(struct domain *d, struct kernel_info *kinfo,
         DT_MATCH_TYPE("memory"),
         /* The memory mapped timer is not supported by Xen. */
         DT_MATCH_COMPATIBLE("arm,armv7-timer-mem"),
+    /* Skip mem span extender */
+    /*DT_MATCH_COMPATIBLE("intel,extender"),*/
         { /* sentinel */ },
     };
     static const struct dt_device_match timer_matches[] __initconst =

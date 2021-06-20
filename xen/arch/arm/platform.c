@@ -88,8 +88,10 @@ int __init platform_specific_mapping(struct domain *d)
 {
     int res = 0;
 
-    if ( platform && platform->specific_mapping )
+    if ( platform && platform->specific_mapping ) {
+	printk("mb: %s():%s:platform has specific mapping\n", __func__, __FILE__);
         res = platform->specific_mapping(d);
+    }
 
     return res;
 }

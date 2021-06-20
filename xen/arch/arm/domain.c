@@ -41,6 +41,8 @@
 
 #include "vuart.h"
 
+#include <asm/extender.h>
+
 DEFINE_PER_CPU(struct vcpu *, curr_vcpu);
 
 static void do_idle(void)
@@ -766,6 +768,10 @@ int arch_domain_create(struct domain *d,
      */
     if ( is_hardware_domain(d) && (rc = domain_vuart_init(d)) )
         goto fail;
+
+    if (IS_ENABLED(CONFIG_MEMORY_SPAN_EXTENDER))
+	    domain_extender_init(d);
+
 
     return 0;
 

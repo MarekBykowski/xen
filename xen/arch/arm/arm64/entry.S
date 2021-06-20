@@ -220,6 +220,7 @@
         alternative_else_nop_endif
 
         mov     x0, sp
+	/*mb: stage-2 abort go here */
         bl      do_trap_\trap
 1:
         exit    hyp=0, compat=\compat
